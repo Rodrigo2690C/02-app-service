@@ -1,0 +1,12 @@
+Comando de inicio (Startup Command) para Azure App Service (Linux, Python):
+
+gunicorn -w 2 -k uvicorn.workers.UvicornWorker main:app
+
+Dónde se pega:
+  Portal de Azure  ->  tu App Service  ->  Configuración  ->  Configuración general
+  ->  campo "Comando de inicio"  ->  pegar la línea de arriba  ->  Guardar.
+
+Notas:
+  - "main:app" significa: archivo main.py, variable app = FastAPI(...).
+  - -w 2  = 2 workers (suficiente para la demo).
+  - App Service detecta requirements.txt e instala las dependencias solo.

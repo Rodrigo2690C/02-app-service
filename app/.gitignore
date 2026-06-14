@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+
+# Base de datos local (SQLite)
+*.db
+
+# Secretos / variables de entorno locales
+.env
+
+# Editores
+.vscode/
+.idea/

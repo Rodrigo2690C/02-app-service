@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tareas — Demo Azure App Service</title>
+  <style>
+    :root { --azul: #0078d4; }
+    * { box-sizing: border-box; }
+    body { font-family: Segoe UI, system-ui, sans-serif; max-width: 640px;
+           margin: 40px auto; padding: 0 16px; color: #222; }
+    h1 { color: var(--azul); }
+    .sub { color: #666; margin-top: -10px; }
+    form { display: flex; gap: 8px; margin: 20px 0; }
+    input[type=text] { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 6px; }
+    button { padding: 10px 16px; border: 0; border-radius: 6px; background: var(--azul);
+             color: #fff; cursor: pointer; }
+    button.sec { background: #eee; color: #333; }
+    ul { list-style: none; padding: 0; }
+    li { display: flex; align-items: center; gap: 10px; padding: 10px;
+         border: 1px solid #eee; border-radius: 6px; margin-bottom: 8px; }
+    li.done span.t { text-decoration: line-through; color: #999; }
+    li .t { flex: 1; }
+    .empty { color: #888; font-style: italic; }
+    footer { margin-top: 30px; color: #888; font-size: 13px; }
+    a { color: var(--azul); }
+  </style>
+</head>
+<body>
+  <h1>📋 Lista de Tareas</h1>
+  <p class="sub">Demo de Azure App Service (PaaS) — FastAPI + Azure SQL</p>
+
+  <form id="form">
+    <input type="text" id="titulo" placeholder="Nueva tarea..." required />
+    <button type="submit">Agregar</button>
+  </form>
+
+  <ul id="lista"></ul>
+
+  <footer>
+    API: <a href="/docs">/docs</a> (Swagger) · Salud: <a href="/health">/health</a>
+  </footer>
+
+  <script>
+    const api = "/api/tareas";
+    const lista = document.getElementById("lista");
+
+    async function cargar() {
+      const r = await fetch(api);
+      const tareas = await r.json();
+      lista.innerHTML = "";
+      if (tareas.length === 0) {
+        lista.innerHTML = '<p class="empty">No hay tareas todavía.</p>';
+        return;
+      }
+      for (const t of tareas) {
+        const li = document.createElement("li");
+        if (t.completada) li.className = "done";
+        li.innerHTML = `
+          <input type="checkbox" ${t.completada ? "checked" : ""} />
+          <span class="t">${t.titulo}</span>
+          <button class="sec">Borrar</button>`;
+        li.querySelector("input").onchange = (e) =>
+          actualizar(t.id, { completada: e.target.checked });
+        li.querySelector("button").onclick = () => borrar(t.id);
+        lista.appendChild(li);
+      }
+    }
+
+    document.getElementById("form").onsubmit = async (e) => {
+      e.preventDefault();
+      const titulo = document.getElementById("titulo").value.trim();
+      if (!titulo) return;
+      await fetch(api, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ titulo }),
+      });
+      document.getElementById("titulo").value = "";
+      cargar();
+    };
+
+    async function actualizar(id, datos) {
+      await fetch(`${api}/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(datos),
+      });
+      cargar();
+    }
+
+    async function borrar(id) {
+      await fetch(`${api}/${id}`, { method: "DELETE" });
+      cargar();
+    }
+
+    cargar();
+  </script>
+</body>
+</html>
