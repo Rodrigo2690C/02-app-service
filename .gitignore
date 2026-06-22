@@ -1,0 +1,20 @@
+# entornos virtuales
+.venv/
+.venv-verify/
+venv/
+env/
+**/.venv/
+# python
+__pycache__/
+*.py[cod]
+# secretos / local
+.env
+*.db
+# capturas del portal (datos de cuenta)
+capturas/
+# tests
+.pytest_cache/
+# node
+node_modules/
+# documentacion: NO subir manuales/markdown
+*.md
